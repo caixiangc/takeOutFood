@@ -1,0 +1,43 @@
+@import './default.less';
+@import './loading.less';
+ul,li{
+    list-style: none;
+}
+::selection { background:lightblue; }
+.clear-fix{
+    &::after{
+        clear: both;
+        content: '';
+        display: block;
+        visibility: hidden
+    }
+}
+.container{
+    background-color: #d7d7d7;
+    display: flex;
+    
+    .nav-left{
+        width: 18%;
+        min-width: 180px;
+        height: calc(100vh);
+        background-color: #001529;
+    }
+    .main{
+        flex:1;
+        height: calc(100vh);
+        overflow: auto;
+    }
+    .content{
+        position: relative;
+        padding: 20px;
+        overflow: auto;
+    }
+}
+.content-wrap{
+    background-color:#ffffff;
+    border: 1px solid #e8e8e8;
+    margin-top: -1px;
+}
+.operate-wrap{
+    margin-top: -12px
+}
