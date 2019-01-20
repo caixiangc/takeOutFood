@@ -17,9 +17,9 @@ export default{
                 console.log("当前页码："+page);
                 callback(page); //发起一个回调告诉后台 页码切换到 某某去了 ，然后在后台查询数据的范围是： current*pagesiz-(current+1)*pagesiz，然后返回json中要带有current传进去的数据
             },
-            current:data.result.page, // 这里的page页数是后台传过来的。
-            pageSize:data.result.page_size,
-            total:data.result.total,
+            current:data.page, // 这里的page页数是后台传过来的。
+            pageSize:data.page_size,//***要注意 */一定要和后台传过来的json格式相互对上否者，复选框可以选中，但是无法标识。
+            total:data.total,
             showTotal: () => {   //showTotal是分页前面显示的html代码
                 return `共${data.result.total}条数据`
             },
@@ -55,19 +55,31 @@ export default{
         return options;
     },
 
-    updateSelectedItem(selectedRowKeys,selectedIds,list,selectedItem){
+    updateSelectedItem(selectedRowKeys,selectedIds,list,selectedItem){   //真正保存值的是在updateSelectItem里面
         if(selectedRowKeys){
             if(list.length>2){
-                document.getElementById("Odetail").setAttribute('disabled','true');
+                if(document.getElementById("Odetail")){
+                    document.getElementById("Odetail").setAttribute('disabled','true');
+                }else if(document.getElementById("user_edit")){
+                    document.getElementById("user_edit").setAttribute('disabled','true');
+                }
+                
+
             }else{
-                document.getElementById("Odetail").removeAttribute("disabled");
+                if(document.getElementById("Odetail")){
+                    document.getElementById("Odetail").removeAttribute("disabled");
+                }else if(document.getElementById("user_edit")){
+                    document.getElementById("user_edit").removeAttribute('disabled','true');
+                }
+                //document.getElementById("user_edit").setAttribute('disabled','true');
+
             }
 
             this.setState({
                 selectedRowKeys:selectedRowKeys,
                 selectedId:selectedIds,
                 idListss:list,
-                selectedItem:selectedItem
+                selectedItem:selectedItem  //把当前选中行挂到指定域上面去即（_this）
             })
 
         }else{

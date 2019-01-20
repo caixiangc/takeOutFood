@@ -54,7 +54,9 @@ export default class CTable extends React.Component{
         }else{
             let selectedRowKeys = [index];
             let selectedItem = record; //加【】表示存入一个数组，就是到时候显示selectedItem这内容就是 selectedItem[0]:.....,[1].....,[2].....
-            this.props.updateSelectedItem(selectedRowKeys,selectedItem); //调用我们外部组件里面的方法。
+            let selectedIds = record.id;
+            let list = record;
+            this.props.updateSelectedItem(selectedRowKeys,selectedIds,list,selectedItem); //调用我们外部组件里面的方法。
             // this.props的域是<CTable>的域，我们虽然在CTable调用，其实是在order.js 哪里生效的，即bind(this)，bind也是那里的this，不是这里的this。 
             //相当于A出发出信号，使B处去调用C里面的方法，B出bind(this),把B的作用域（指针）给传到C。
         }

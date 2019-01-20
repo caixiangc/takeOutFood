@@ -50,7 +50,7 @@ const {RangePicker} = DatePicker;
     ]
 
     
-    componentDidMount(){
+    componentDidMount(){  //CTABLE相关 
         this.requestList();
         
     }
@@ -58,9 +58,8 @@ const {RangePicker} = DatePicker;
         this.params = params;  //传递参数通过BaseForm 形成特定的表格
         this.requestList();   
     }
-    requestList = ()=>{
+    requestList = ()=>{  //CTABLE相关
         let _this = this;
-        
         axios.requestList(this,'/order/list',this.params,true);
         //api: 通过这条语句 会把返回的结果append到 this作用域下的list 里面，我们要用 直接this.list 就可以了
     }
@@ -178,11 +177,10 @@ const {RangePicker} = DatePicker;
                     <CTable
                         columns={columns}
                         updateSelectedItem = {Utils.updateSelectedItem.bind(this)}
+                        //这里的updateSelectedItem={Utils.updateSelectedItem.bind(this)}并不是直接在这里调用Utils.updateSelectedItem(这里写上去只是个属性，是做铺垫方便在CTable中调用这个属性)，，而是在组件中CTable中通过this.props.updateSelectedItem 来调用 外部的updateSelectedItem的这个方法，里面参数也是在里面传的
                         dataSource = {this.state.list}
                         pagination = {this.state.pagination}   //要分页就必须设置后面的 的等于{this.state.pagination}  因为 分页后调用回调，回调把改变后的信息都放在这里。
                         selectedRowKeys = {this.state.selectedRowKeys}  //只要在<Table> 中写了selectedRowKeys，我们就能选中后通过selectedRowkeys 获取数据
-                        //selectedIds = {this.IdList}
-                        //rowSelection = {false}
                         rowSelection='checkbox'
                     />
                 </Card> 

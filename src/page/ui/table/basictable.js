@@ -165,6 +165,7 @@ export default class BasicForm extends React.Component{
                 
                     </Table>
                 </Card>
+                
             </div>
             
         
