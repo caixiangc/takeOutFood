@@ -12,6 +12,7 @@ export default{
     },
 
     pagination(data,callback){ //data 当前第几页一共有几条数据,,当点击下一页的时候出发 callback去回调
+        
         let page = { //这里的callback 就是外面的那一串回调函数，， callback(page);就相当于会调用外面的那一大串东西，onChange是时刻监听的
             onChange:(page)=>{
                 console.log("当前页码："+page);
@@ -21,12 +22,39 @@ export default{
             pageSize:data.page_size,//***要注意 */一定要和后台传过来的json格式相互对上否者，复选框可以选中，但是无法标识。
             total:data.total,
             showTotal: () => {   //showTotal是分页前面显示的html代码
-                return `共${data.result.total}条数据`
+                return `共${data.total}条数据`
             },
             showQuickJumper:true,
 
         }
         return page;
+    },
+
+    myPagination(data,callback){ //data 当前第几页一共有几条数据,,当点击下一页的时候出发 callback去回调
+        
+        let page = { //这里的callback 就是外面的那一串回调函数，， callback(page);就相当于会调用外面的那一大串东西，onChange是时刻监听的
+            onChange:(page)=>{
+                console.log("当前页码："+page);
+                callback(page); //发起一个回调告诉后台 页码切换到 某某去了 ，然后在后台查询数据的范围是： current*pagesiz-(current+1)*pagesiz，然后返回json中要带有current传进去的数据
+            },
+            current:data.currentPage, // 这里的page页数是后台传过来的。
+            pageSize:data.currentPSize,//***要注意 */一定要和后台传过来的json格式相互对上否者，复选框可以选中，但是无法标识。
+            total:data.total,
+            showTotal: () => {   //showTotal是分页前面显示的html代码
+                return `共${data.total}条数据`
+            },
+            showQuickJumper:true,
+
+        }
+        return page;
+    },
+
+    fmtDate(obj){
+        var date =  new Date(obj);
+        var y = 1900+date.getYear();
+        var m = "0"+(date.getMonth()+1);
+        var d = "0"+date.getDate();
+        return y+"-"+m.substring(m.length-2,m.length)+"-"+d.substring(d.length-2,d.length);
     },
 
     getLocation(){  //用于获取每个收货地址的经纬度。
@@ -74,10 +102,23 @@ export default{
                 //document.getElementById("user_edit").setAttribute('disabled','true');
 
             }
-
-            this.setState({
+            let c = this.state.selectedId;
+            let flag = 1;
+            if(c){
+                c.map((item,index)=>{
+                    if(item == selectedItem.productId){
+                        flag = 0;
+                        return;
+                    }
+                })
+                if(flag==1){
+                    c.push(selectedItem.productId+'')
+                }
+            }
+            
+            this.setState({  //因为bind(this)了所以 这里的this 是外部的this
                 selectedRowKeys:selectedRowKeys,
-                selectedId:selectedIds,
+                selectedId:c,
                 idListss:list,
                 selectedItem:selectedItem  //把当前选中行挂到指定域上面去即（_this）
             })

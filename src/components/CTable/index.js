@@ -43,7 +43,7 @@ export default class CTable extends React.Component{
             selectedIds = listb.substr(0, listb.length - 1);
             //console.log("listb:"+selectedIds);
 
-            this.idListReal=[-1];
+            this.idListReal=[-1]; //强行构造出一个数组，否者idListReal 不能push数据
             this.idList.map((item)=>{
                 if(item){
                     this.idListReal.push(item);
@@ -81,7 +81,7 @@ export default class CTable extends React.Component{
         }
         return(
             <Table
-            bordered
+            bordered   //this.props 代表的是外部所有的属性。this 指的就是CTable
             {...this.props} //对this.props 进行解构 ，在外面组件上定义的三个组件都会解构进来。columns={columns} dataSource = {this.state.list} pagination = {this.state.pagination}
             //只要table里面设置了 pagination 就能在方法中调用 pagination里面的api
             rowSelection={row_selection?rowSelection:false}   //控制radio 或者是checkbox

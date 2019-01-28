@@ -25,7 +25,10 @@ export default class BasicForm extends React.Component{
                     page:this.params.page
                 }
                 //isShowloading:false   //这个data里面的两个参数，如果还需要可以继续往下加
-            }
+            },
+            methods:'get',
+            isMock:true
+            
         }).then((res)=>{ //这里then 说明前面分装方法 返回的是一个promise
             if(res.code==0){
                 

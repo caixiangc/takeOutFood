@@ -1,17 +1,19 @@
 import JsonP from 'jsonp'
 import axios from 'axios'
-import { Modal } from 'antd';
+import { Modal,message } from 'antd';
 import Utils from './../utils/utils'
 export default class Axios{
 
-    static requestList(_this,url,params,isMock){
+    //自带pagination的功能不用你多加 和CTable 组合使用，最总数据渲染在 this.state.list上面
+    static requestList(_this,url,params,isMock,methods){
         var data ={
             params: params
         }
         this.ajax({   //这里 ajax({params}),{params}其实就是个参数，我么写成{a,b,c}是因为参数是个对象。
             url,  //这种写法就是 url:url;
             data,
-            isMock
+            isMock,
+            methods:methods
         }).then((data)=>{
             if(data && data.result){
                 let list = data.result.list.map((item, index) => {
@@ -29,6 +31,69 @@ export default class Axios{
             }
         })
     }
+    //mydetails List page
+    static requestDetailList(_this,url,params,isMock,methods){
+        var data ={
+            params: params
+        }
+        this.ajax({   //这里 ajax({params}),{params}其实就是个参数，我么写成{a,b,c}是因为参数是个对象。
+            url,  //这种写法就是 url:url;
+            data,
+            isMock,
+            methods:methods
+        }).then((data)=>{
+            if(data){
+                let list = data.data.map((item, index) => {
+                    item.key = index;
+                    return item;  
+                    //因为这里定义了一个list来接受所以要注意这里一定要return 否者这个item.list还是老的那个数组
+                });
+                data.currentPage = params.page;
+                data.currentPSize = params.size;
+                _this.setState({  // 注意这里的this的域就是外部的域（调用它的域）
+                    detailList:list,
+                    pagination:Utils.myPagination(data,(current)=>{ //只要在在组件中加入pagination ，就可以调用 分页组件的api了，这里current也是不例外
+                        _this.paramsName.page = current;   
+                        _this.requestDetailListin();  //通过回调来出发分页时间。
+                    })
+                })
+            }
+        })
+    }
+
+    //unTablePagination-begin
+    static unTableRequestList(_this,url,params,isMock,methods){
+        var data ={
+            params: params
+        }
+        this.ajax({   //这里 ajax({params}),{params}其实就是个参数，我么写成{a,b,c}是因为参数是个对象。
+            url,  //这种写法就是 url:url;
+            data,
+            isMock,
+            methods:methods
+        }).then((res)=>{
+            if(res){
+                // let lists ="";
+                // res.data.map((item, index) => {
+                //     //lists += "<div className=\"items\"><Card hoverable style={{ width: 300 }} cover={<img alt=\"example\"  src=\"/assets/as.jpg\"/>}> <Meta title='"+item.productName+"' description='"+item.productDescription+"' /> <div className=\"itemselect\"> <a data-id='"+item.productDescription.productId+"'>立即购买</a> <a>加入购物车</a> </div> </Card></div>"
+                //     //lists += "<div className=\"items\"><img src=\"/assets/as.jpg\"></img><h3>'"+item.productName+"'</h3><h5>'"+item.productDescription+"'</h5><div className=\"itemselect\"><a data-id='"+item.productDescription.productId+"'>立即购买</a><a>加入购物车</a></div></div>"
+                //     lists +="<div className=\"items\" style={{float:\"left\",border: \"1px solid #e9e9e9\",width: \"20%\",marginRight: \"3%\",marginTop: \"2%\"}}><img src=\"/assets/as.jpg\" style={{width: \"100%\"}}></img><h3 style={{margin: \"20px 20px\"}}>'"+item.productName+"'</h3><h5 style={{margin: \"20px 20px\"}}>'"+item.productDescription+"'</h5><div style={{margin:\"27px 13px\",marginTop: \"30px\",display: \"flex\"}} className=\"itemselect\"><div data-id='"+item.productId+"' style={{border:\"1px solid salmon\",color: \"salmon\",textAlign: \"center\",width: \"130px\",height: \"36px\",fontSize: \"20px\",marginRight: \"10px\",display: \"block\"}}>立即购买</div><div data-id='"+item.productId+"' style={{border: \"1px solid salmon\",color: \"salmon\",textAlign: \"center\",width: \"130px\",height: \"36px\",fontSize: \"20px\",marginRight: \"10px\",display: \"block\"}}>加入购物车</div></div></div>"
+                // });
+                //console.log(lists);
+                _this.setState({  
+                    list:res.data,
+                    //list:lists,
+                    loading:false,
+                    total:res.total
+                })
+                //_this.list = list;
+            }
+        })
+    }
+
+    //unTablePagination-close
+
+
 
     static jsonp(options){
         return new Promise((resolve,reject)=>{  //****** */
@@ -37,6 +102,21 @@ export default class Axios{
                 //todo
                 debugger;
                 if(response.resultcode == '200'){
+                    resolve(response); //resolve（）成功之后把数据返回回去
+                }else{
+                    reject(response.message);
+                }
+            })
+        })
+    }
+
+    static jsonpss(options){
+        return new Promise((resolve,reject)=>{  //****** */
+            JsonP(options.url,
+            function (err,response){
+                //todo
+                debugger;
+                if(response.code == 0){
                     resolve(response); //resolve（）成功之后把数据返回回去
                 }else{
                     reject(response.message);
@@ -64,14 +144,19 @@ export default class Axios{
 
     static ajax(options){
         let baseUrl = ''; 
+        if(options.isMock==null){
+            options.isMock=true;
+        }
         //let baseUrl = 'https://www.easy-mock.com/mock/5a7278e28d0c633b9c4adbd7/api';
         if(options.isMock){
             baseUrl = 'https://www.easy-mock.com/mock/5c2e0ba7c8123b4eccf80408/mockapi'
         }else{
-            baseUrl = 'https://www.easy-mock.com/mock/5c2e0ba7c8123b4eccf80408/mockapi'
+            baseUrl = 'http://localhost:8087/sell/'
             //等有真正的接口的时候，把这里替换成真正的接口
         }
-
+        if(options.methods==null){
+            options.methods="get"
+        }
         let loading;
         if((options.data && options.data.isShowloading) != false){
             loading = document.getElementById("ajaxLoading");  //打包的时候回加载这个public html，当我们需要的时候把这个loading的html给block，数据加载好了就none 
@@ -81,7 +166,7 @@ export default class Axios{
         return new Promise((resolve,reject)=>{  //promise 会接收一个回调函数,这个回调函数，当解析成功的时候会调用resolve去返回，不成功就会调用reject去返回
             axios({
                 url:options.url,
-                method:'get',
+                method:options.methods,
                 baseURL:baseUrl,
                 timeout:5000,
                 params:(options.data && options.data.params) ||'' // 意思是如果options.data存在那么就去取options.data.param 否者就去 ‘’
@@ -95,10 +180,8 @@ export default class Axios{
                         resolve(response.data);//这里的resolve方法就相当于把成功的数据给 抛出去
                         //resolve是js引擎提供的，resolve和reject都是个函数，而这个函数的参数是我们ajax请求返回的结构
                     }else{
-                        Modal.info({
-                            title:"提示",
-                            content:response.data.msg
-                        })
+                        message.error("请求后台接口失败")
+                        
                     }
                 }else{
                     reject(response.data) //要是调用接口出错那么就调用reject(response.data)，其实就是通过reject打印出来 

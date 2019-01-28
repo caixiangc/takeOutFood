@@ -43,7 +43,7 @@ export default class User extends React.Component{
         },
     ]
 
-    componentDidMount(){
+    componentWillMount(){
         this.requestList();
     }
 
@@ -203,7 +203,7 @@ export default class User extends React.Component{
             <Card className="operate-wrap">               
                 <CTable
                     columns={columns}
-                    updateSelectedItem = {Utils.updateSelectedItem.bind(this)}
+                    updateSelectedItem = {Utils.updateSelectedItem.bind(this)}  //这个updateSelectedItem是从CTable组件内部调用他的。
                     dataSource = {this.state.list}  //这里的this.state.list 和axios.requestList() 返回的值的互通的。
                     pagination = {this.state.pagination}   //要分页就必须设置后面的 的等于{this.state.pagination}  因为 分页后调用回调，回调把改变后的信息都放在这里。
                     selectedRowKeys = {this.state.selectedRowKeys}  //只要在<Table> 中写了selectedRowKeys，我们就能选中后通过selectedRowkeys 获取数据
